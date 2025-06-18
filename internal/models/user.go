@@ -15,6 +15,7 @@ const (
 
 type User struct {
 	ID           uuid.UUID `json:"id" gorm:"type:uuid;primarykey;default:gen_random_uuid()"`
+	Fullname     string    `json:"fullname" gorm:"type:varchar(255);default:''"`
 	Email        string    `json:"email" gorm:"type:varchar(255);unique;not null"`
 	Username     string    `json:"username" gorm:"type:varchar(255);unique;not null"`
 	PasswordHash string    `json:"-" gorm:"type:varchar(255);not null"`
@@ -33,6 +34,7 @@ type User struct {
 
 type RegisterRequest struct {
 	Email    string   `json:"email" validate:"required,email"`
+	Fullname string   `json:"fullname" validate:"required,min=2,max=100"`
 	Username string   `json:"username" validate:"required,min=3,max=50"`
 	Password string   `json:"password" validate:"required,min=8"`
 	Role     UserRole `json:"role"`
@@ -52,6 +54,7 @@ type AuthResponse struct {
 
 type UserResponse struct {
 	ID        uuid.UUID `json:"id"`
+	Fullname  string    `json:"fullname"`
 	Email     string    `json:"email"`
 	Username  string    `json:"username"`
 	Role      UserRole  `json:"role"`

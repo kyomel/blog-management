@@ -21,6 +21,8 @@ type AuthConfig struct {
 
 func SetupAuth(router *gin.Engine, db *sql.DB, config AuthConfig) {
 	userRepo := repositories.NewUserRepository(db)
+	categoryRepo := repositories.NewCategoryRepository(db)
+
 	jwtService := utils.NewJWTService(
 		config.AccessSecret,
 		config.RefreshSecret,
@@ -34,21 +36,11 @@ func SetupAuth(router *gin.Engine, db *sql.DB, config AuthConfig) {
 		config.AccessExpiry,
 	)
 
+	categoryService := services.NewCategoryService(categoryRepo)
 	authMiddleware := middleware.NewAuthMiddleware(authService)
-
 	authHandler := handlers.NewAuthHandler(authService)
+	categoryHandler := handlers.NewCategoryHandler(categoryService)
 
-	handlers.RegisterRoutes(router, authHandler)
-
-	protected := router.Group("/api")
-	protected.Use(authMiddleware.Authenticate())
-	{
-		admin := protected.Group("/admin")
-		admin.Use(authMiddleware.RequireRole("admin"))
-		{
-			admin.GET("/dashboard", func(c *gin.Context) {
-				c.JSON(200, gin.H{"message": "Admin dashboard"})
-			})
-		}
-	}
+	// Register all routes with appropriate middleware
+	handlers.RegisterRoutes(router, authHandler, categoryHandler, authMiddleware)
 }

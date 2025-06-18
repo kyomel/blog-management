@@ -42,28 +42,24 @@ func NewAuthService(
 }
 
 func (s *authService) Register(ctx context.Context, req models.RegisterRequest) (*models.AuthResponse, error) {
-	// Hash the password
 	hashedPassword, err := utils.HashPassword(req.Password)
 	if err != nil {
 		return nil, err
 	}
-
-	// Create new user
 	user := &models.User{
 		Email:        req.Email,
+		Fullname:     req.Fullname,
 		Username:     req.Username,
 		PasswordHash: hashedPassword,
-		Role:         models.RoleUser, // Default role
+		Role:         models.RoleUser,
 		IsActive:     true,
 	}
 
-	// Save user to database
 	err = s.userRepo.Create(ctx, user)
 	if err != nil {
 		return nil, err
 	}
 
-	// Generate JWT tokens
 	tokens, err := s.jwtService.GenerateTokenPair(
 		user.ID,
 		user.Username,
@@ -79,6 +75,7 @@ func (s *authService) Register(ctx context.Context, req models.RegisterRequest) 
 			ID:        user.ID,
 			Email:     user.Email,
 			Username:  user.Username,
+			Fullname:  user.Fullname,
 			Role:      user.Role,
 			AvatarURL: user.AvatarURL,
 			IsActive:  user.IsActive,
@@ -91,7 +88,6 @@ func (s *authService) Register(ctx context.Context, req models.RegisterRequest) 
 }
 
 func (s *authService) Login(ctx context.Context, req models.LoginRequest) (*models.AuthResponse, error) {
-	// Find user by email
 	user, err := s.userRepo.FindByEmail(ctx, req.Email)
 	if err != nil {
 		if errors.Is(err, repositories.ErrUserNotFound) {
@@ -100,18 +96,15 @@ func (s *authService) Login(ctx context.Context, req models.LoginRequest) (*mode
 		return nil, err
 	}
 
-	// Check if user is active
 	if !user.IsActive {
 		return nil, ErrUserNotActive
 	}
 
-	// Verify password
 	err = utils.VerifyPassword(user.PasswordHash, req.Password)
 	if err != nil {
 		return nil, ErrInvalidCredentials
 	}
 
-	// Generate JWT tokens
 	tokens, err := s.jwtService.GenerateTokenPair(
 		user.ID,
 		user.Username,

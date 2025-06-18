@@ -96,19 +96,16 @@ func (s *jwtService) GenerateTokenPair(userID uuid.UUID, username, email, role s
 }
 
 func (s *jwtService) ValidateToken(tokenString string) (*JWTClaims, error) {
-	// First try with access secret
 	token, err := jwt.ParseWithClaims(tokenString, &JWTClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return s.accessSecret, nil
 	})
 
-	// If token is valid with access secret, return it
 	if err == nil && token.Valid {
 		if claims, ok := token.Claims.(*JWTClaims); ok {
 			return claims, nil
 		}
 	}
 
-	// If error is not because of token expiration, try with refresh secret
 	if err != nil && !errors.Is(err, jwt.ErrTokenExpired) {
 		token, err = jwt.ParseWithClaims(tokenString, &JWTClaims{}, func(token *jwt.Token) (interface{}, error) {
 			return s.refreshSecret, nil
@@ -121,7 +118,6 @@ func (s *jwtService) ValidateToken(tokenString string) (*JWTClaims, error) {
 		}
 	}
 
-	// If we get here, the token is invalid with both secrets
 	if errors.Is(err, jwt.ErrTokenExpired) {
 		return nil, ErrExpiredToken
 	}
