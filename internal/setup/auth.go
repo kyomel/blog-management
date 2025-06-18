@@ -22,6 +22,8 @@ type AuthConfig struct {
 func SetupAuth(router *gin.Engine, db *sql.DB, config AuthConfig) {
 	userRepo := repositories.NewUserRepository(db)
 	categoryRepo := repositories.NewCategoryRepository(db)
+	postRepo := repositories.NewPostRepository(db)
+	tagRepo := repositories.NewTagRepository(db)
 
 	jwtService := utils.NewJWTService(
 		config.AccessSecret,
@@ -37,10 +39,14 @@ func SetupAuth(router *gin.Engine, db *sql.DB, config AuthConfig) {
 	)
 
 	categoryService := services.NewCategoryService(categoryRepo)
+	postService := services.NewPostService(postRepo)
+	tagService := services.NewTagService(tagRepo)
+
 	authMiddleware := middleware.NewAuthMiddleware(authService)
 	authHandler := handlers.NewAuthHandler(authService)
 	categoryHandler := handlers.NewCategoryHandler(categoryService)
+	postHandler := handlers.NewPostHandler(postService)
+	tagHandler := handlers.NewTagHandler(tagService)
 
-	// Register all routes with appropriate middleware
-	handlers.RegisterRoutes(router, authHandler, categoryHandler, authMiddleware)
+	handlers.RegisterRoutes(router, authHandler, categoryHandler, postHandler, tagHandler, authMiddleware)
 }

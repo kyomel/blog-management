@@ -71,7 +71,6 @@ func Migrate() error {
 		&models.Category{},
 		&models.Tag{},
 		&models.Post{},
-		&models.Comment{},
 		&models.MediaFile{},
 		&models.AuditLog{},
 	)

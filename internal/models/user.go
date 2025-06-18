@@ -27,7 +27,6 @@ type User struct {
 	DeletedAt    time.Time `json:"deleted_at" gorm:"index"`
 
 	Posts      []Post      `json:"posts,omitempty" gorm:"foreignKey:AuthorID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	Comments   []Comment   `json:"comments,omitempty" gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	MediaFiles []MediaFile `json:"media_files,omitempty" gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	AuditLogs  []AuditLog  `json:"audit_logs,omitempty" gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }

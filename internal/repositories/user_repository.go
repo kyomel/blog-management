@@ -61,8 +61,8 @@ func (r *userRepository) Create(ctx context.Context, user *models.User) error {
 	user.UpdatedAt = now
 
 	query := `
-		INSERT INTO users (id, email, username, password_hash, role, avatar_url, is_active, created_at, updated_at)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+		INSERT INTO users (id, email, username, fullname, password_hash, role, avatar_url, is_active, created_at, updated_at)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
 	`
 	_, err = r.db.ExecContext(
 		ctx,
@@ -70,6 +70,7 @@ func (r *userRepository) Create(ctx context.Context, user *models.User) error {
 		user.ID,
 		user.Email,
 		user.Username,
+		user.Fullname,
 		user.PasswordHash,
 		user.Role,
 		user.AvatarURL,
@@ -82,7 +83,7 @@ func (r *userRepository) Create(ctx context.Context, user *models.User) error {
 
 func (r *userRepository) FindByID(ctx context.Context, id uuid.UUID) (*models.User, error) {
 	query := `
-		SELECT id, email, username, password_hash, role, avatar_url, is_active, created_at, updated_at, deleted_at
+		SELECT id, email, username, fullname, password_hash, role, avatar_url, is_active, created_at, updated_at, deleted_at
 		FROM users
 		WHERE id = $1 AND deleted_at IS NULL
 	`
@@ -91,7 +92,7 @@ func (r *userRepository) FindByID(ctx context.Context, id uuid.UUID) (*models.Us
 
 func (r *userRepository) FindByEmail(ctx context.Context, email string) (*models.User, error) {
 	query := `
-		SELECT id, email, username, password_hash, role, avatar_url, is_active, created_at, updated_at, deleted_at
+		SELECT id, email, username, fullname, password_hash, role, avatar_url, is_active, created_at, updated_at, deleted_at
 		FROM users
 		WHERE email = $1 AND deleted_at IS NULL
 	`
@@ -100,7 +101,7 @@ func (r *userRepository) FindByEmail(ctx context.Context, email string) (*models
 
 func (r *userRepository) FindByUsername(ctx context.Context, username string) (*models.User, error) {
 	query := `
-		SELECT id, email, username, password_hash, role, avatar_url, is_active, created_at, updated_at, deleted_at
+		SELECT id, email, username, fullname, password_hash, role, avatar_url, is_active, created_at, updated_at, deleted_at
 		FROM users
 		WHERE username = $1 AND deleted_at IS NULL
 	`
@@ -115,6 +116,7 @@ func (r *userRepository) findOneByQuery(ctx context.Context, query string, args 
 		&user.ID,
 		&user.Email,
 		&user.Username,
+		&user.Fullname,
 		&user.PasswordHash,
 		&user.Role,
 		&user.AvatarURL,
@@ -147,14 +149,15 @@ func (r *userRepository) Update(ctx context.Context, user *models.User) error {
 
 	query := `
 		UPDATE users
-		SET email = $1, username = $2, password_hash = $3, role = $4, avatar_url = $5, is_active = $6, updated_at = $7
-		WHERE id = $8 AND deleted_at IS NULL
+		SET email = $1, username = $2, fullname = $3, password_hash = $4, role = $5, avatar_url = $6, is_active = $7, updated_at = $8
+		WHERE id = $9 AND deleted_at IS NULL
 	`
 	result, err := r.db.ExecContext(
 		ctx,
 		query,
 		user.Email,
 		user.Username,
+		user.Fullname,
 		user.PasswordHash,
 		user.Role,
 		user.AvatarURL,

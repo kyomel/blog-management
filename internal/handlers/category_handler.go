@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"log"
 	"net/http"
 	"strconv"
 
@@ -129,7 +128,6 @@ func (h *CategoryHandler) UpdateCategory(c *gin.Context) {
 		case services.ErrCategorySlugConflict:
 			c.JSON(http.StatusConflict, gin.H{"error": "A category with this slug already exists"})
 		default:
-			log.Printf("Error updating category: %v", err)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update category"})
 		}
 		return
