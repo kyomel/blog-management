@@ -30,3 +30,32 @@ type User struct {
 	MediaFiles []MediaFile `json:"media_files,omitempty" gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	AuditLogs  []AuditLog  `json:"audit_logs,omitempty" gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }
+
+type RegisterRequest struct {
+	Email    string   `json:"email" validate:"required,email"`
+	Username string   `json:"username" validate:"required,min=3,max=50"`
+	Password string   `json:"password" validate:"required,min=8"`
+	Role     UserRole `json:"role"`
+}
+
+type LoginRequest struct {
+	Email    string `json:"email" validate:"required,email"`
+	Password string `json:"password" validate:"required"`
+}
+
+type AuthResponse struct {
+	User         UserResponse `json:"user"`
+	AccessToken  string       `json:"access_token"`
+	RefreshToken string       `json:"refresh_token"`
+	ExpiresIn    int64        `json:"expires_in"`
+}
+
+type UserResponse struct {
+	ID        uuid.UUID `json:"id"`
+	Email     string    `json:"email"`
+	Username  string    `json:"username"`
+	Role      UserRole  `json:"role"`
+	AvatarURL string    `json:"avatar_url"`
+	IsActive  bool      `json:"is_active"`
+	CreatedAt time.Time `json:"created_at"`
+}

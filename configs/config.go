@@ -60,8 +60,10 @@ func LoadConfig() (*Config, error) {
 			SSLMode:  viper.GetString("DB_SSLMODE"),
 		},
 		JWT: JWTConfig{
-			Secret: viper.GetString("JWT_SECRET"),
-			Expiry: viper.GetString("JWT_EXPIRY"),
+			AccessSecret:  viper.GetString("JWT_ACCESS_SECRET"),
+			RefreshSecret: viper.GetString("JWT_REFRESH_SECRET"),
+			AccessExpiry:  viper.GetString("JWT_ACCESS_EXPIRY"),
+			RefreshExpiry: viper.GetString("JWT_REFRESH_EXPIRY"),
 		},
 	}
 
@@ -111,23 +113,11 @@ func setDefaults() {
 	viper.SetDefault("DB_PORT", "5432")
 	viper.SetDefault("DB_SSLMODE", "disable")
 
-	viper.SetDefault("JWT_EXPIRY", "24h")
+	viper.SetDefault("JWT_ACCESS_SECRET", "default_access_secret_change_me")
+	viper.SetDefault("JWT_REFRESH_SECRET", "default_refresh_secret_change_me")
+	viper.SetDefault("JWT_ACCESS_EXPIRY", "15m")
+	viper.SetDefault("JWT_REFRESH_EXPIRY", "7d")
 
-}
-
-func bindEnvVars() {
-	_ = viper.BindEnv("server.port", "SERVER_PORT")
-	_ = viper.BindEnv("server.mode", "SERVER_MODE")
-
-	_ = viper.BindEnv("database.host", "DB_HOST")
-	_ = viper.BindEnv("database.port", "DB_PORT")
-	_ = viper.BindEnv("database.user", "DB_USER")
-	_ = viper.BindEnv("database.password", "DB_PASSWORD")
-	_ = viper.BindEnv("database.dbname", "DB_NAME")
-	_ = viper.BindEnv("database.sslmode", "DB_SSLMODE")
-
-	_ = viper.BindEnv("jwt.secret", "JWT_SECRET")
-	_ = viper.BindEnv("jwt.expiry", "JWT_EXPIRY")
 }
 
 type ServerConfig struct {
@@ -145,6 +135,8 @@ type DatabaseConfig struct {
 }
 
 type JWTConfig struct {
-	Secret string `mapstructure:"secret"`
-	Expiry string `mapstructure:"expiry"`
+	AccessSecret  string `mapstructure:"access_secret"`
+	RefreshSecret string `mapstructure:"refresh_secret"`
+	AccessExpiry  string `mapstructure:"access_expiry"`
+	RefreshExpiry string `mapstructure:"refresh_expiry"`
 }
