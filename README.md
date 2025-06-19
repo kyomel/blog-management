@@ -6,7 +6,7 @@ A robust and scalable RESTful API for managing blog content, built with Go and P
 
 ## Postman Collection
 
-You can find the Postman collection for this API in the `https://blue-meadow-676498.postman.co/workspace/f9da828a-04ac-4d3b-8e18-efad496fbf34/documentation/10995686-9b9a59ad-058a-4287-a296-8d436e6b94da` directory.
+You can find the Postman collection for this API in the `https://documenter.getpostman.com/view/10995686/2sB2x9jqfj`.
 
 ## Technology Stack
 
