@@ -65,8 +65,9 @@ func (s *postService) Create(ctx context.Context, req *models.CreatePostRequest)
 		Status:           req.Status,
 		IsFeatured:       req.IsFeatured,
 		Metadata:         req.Metadata,
-		CreatedAt:        time.Now(),
-		UpdatedAt:        time.Now(),
+		// Use pointers for time fields
+		CreatedAt:        func() *time.Time { now := time.Now(); return &now }(),
+		UpdatedAt:        func() *time.Time { now := time.Now(); return &now }(),
 	}
 
 	// Set PublishedAt if status is published
@@ -215,7 +216,8 @@ func (s *postService) Update(ctx context.Context, id uuid.UUID, req *models.Upda
 		post.Metadata = req.Metadata
 	}
 
-	post.UpdatedAt = time.Now()
+	now := time.Now()
+	post.UpdatedAt = &now
 
 	// Update post and tags
 	if err := s.repo.Update(post, req.TagIDs); err != nil {
@@ -261,7 +263,7 @@ func (s *postService) Publish(ctx context.Context, id uuid.UUID) (*models.PostRe
 	post.Status = models.StatusPublished
 	now := time.Now()
 	post.PublishedAt = &now
-	post.UpdatedAt = now
+	post.UpdatedAt = &now
 
 	// Update post
 	if err := s.repo.Update(post, nil); err != nil {

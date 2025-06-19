@@ -134,7 +134,7 @@ func (r *userRepository) findOneByQuery(ctx context.Context, query string, args 
 	}
 
 	if deletedAt.Valid {
-		user.DeletedAt = deletedAt.Time
+		user.DeletedAt = &deletedAt.Time
 	}
 
 	return &user, nil

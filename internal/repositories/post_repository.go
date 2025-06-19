@@ -76,7 +76,7 @@ func (r *PostRepository) GetByID(id uuid.UUID) (*models.Post, error) {
                p.excerpt, p.featured_image_url, p.status, p.view_count, 
                p.is_featured, p.metadata, p.published_at, p.created_at, 
                p.updated_at, p.deleted_at,
-               u.username, u.full_name, u.avatar_url,
+               u.username, u.fullname, u.avatar_url,
                c.name, c.slug
         FROM posts p
         JOIN users u ON p.author_id = u.id
@@ -140,7 +140,7 @@ func (r *PostRepository) GetBySlug(slug string) (*models.Post, error) {
                p.excerpt, p.featured_image_url, p.status, p.view_count, 
                p.is_featured, p.metadata, p.published_at, p.created_at, 
                p.updated_at, p.deleted_at,
-               u.username, u.full_name, u.avatar_url,
+               u.username, u.fullname, u.avatar_url,
                c.name, c.slug
         FROM posts p
         JOIN users u ON p.author_id = u.id
@@ -244,7 +244,7 @@ func (r *PostRepository) GetAll(filter *models.PostFilter) ([]*models.Post, int,
         SELECT p.id, p.author_id, p.category_id, p.title, p.slug, p.excerpt, 
                p.featured_image_url, p.status, p.view_count, p.is_featured, 
                p.metadata, p.published_at, p.created_at, p.updated_at,
-               u.username, u.full_name, u.avatar_url,
+               u.username, u.fullname, u.avatar_url,
                c.name, c.slug
         FROM posts p
         JOIN users u ON p.author_id = u.id
@@ -313,7 +313,8 @@ func (r *PostRepository) Update(post *models.Post, tagIDs []uuid.UUID) error {
 	}
 	defer tx.Rollback()
 
-	post.UpdatedAt = time.Now()
+	now := time.Now()
+	post.UpdatedAt = &now
 
 	query := `
         UPDATE posts

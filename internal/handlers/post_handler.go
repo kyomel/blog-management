@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -23,17 +24,23 @@ func NewPostHandler(postService services.PostService) *PostHandler {
 func (h *PostHandler) CreatePost(c *gin.Context) {
 	var req models.CreatePostRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body", "details": err.Error()})
 		return
 	}
 
+	// Log the request for debugging
+	fmt.Printf("Creating post with request: %+v\n", req)
+
 	post, err := h.postService.Create(c.Request.Context(), &req)
 	if err != nil {
+		// Log the detailed error
+		fmt.Printf("Error creating post: %v\n", err)
+
 		switch err {
 		case services.ErrPostSlugConflict:
 			c.JSON(http.StatusConflict, gin.H{"error": "A post with this slug already exists"})
 		default:
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create post"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create post", "details": err.Error()})
 		}
 		return
 	}
@@ -104,18 +111,14 @@ func (h *PostHandler) ListPosts(c *gin.Context) {
 		pageSize = 10
 	}
 
-	// Build filter from query parameters
 	filter := &models.PostFilter{}
 
-	// Filter by status
 	if status := c.Query("status"); status != "" {
 		filter.Status = models.PostStatus(status)
 	} else {
-		// Default to published posts for public API
 		filter.Status = models.StatusPublished
 	}
 
-	// Filter by category
 	if categoryID := c.Query("category_id"); categoryID != "" {
 		id, err := uuid.Parse(categoryID)
 		if err == nil {
@@ -123,7 +126,6 @@ func (h *PostHandler) ListPosts(c *gin.Context) {
 		}
 	}
 
-	// Filter by author
 	if authorID := c.Query("author_id"); authorID != "" {
 		id, err := uuid.Parse(authorID)
 		if err == nil {
@@ -131,13 +133,11 @@ func (h *PostHandler) ListPosts(c *gin.Context) {
 		}
 	}
 
-	// Filter by featured
 	if featured := c.Query("featured"); featured == "true" {
 		isFeatured := true
 		filter.IsFeatured = &isFeatured
 	}
 
-	// Search term
 	filter.Search = c.Query("search")
 
 	result, err := h.postService.GetAll(c.Request.Context(), filter, page, pageSize)

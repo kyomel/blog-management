@@ -22,9 +22,9 @@ type User struct {
 	Role         UserRole  `json:"role" gorm:"type:varchar(20);default:user"`
 	AvatarURL    string    `json:"avatar_url"`
 	IsActive     bool      `json:"is_active" gorm:"type:boolean;default:true"`
-	CreatedAt    time.Time `json:"created_at"`
-	UpdatedAt    time.Time `json:"updated_at"`
-	DeletedAt    time.Time `json:"deleted_at" gorm:"index"`
+	CreatedAt    time.Time  `json:"created_at"`
+	UpdatedAt    time.Time  `json:"updated_at"`
+	DeletedAt    *time.Time `json:"deleted_at,omitempty" gorm:"index"`
 
 	Posts      []Post      `json:"posts,omitempty" gorm:"foreignKey:AuthorID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	MediaFiles []MediaFile `json:"media_files,omitempty" gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`

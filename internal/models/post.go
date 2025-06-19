@@ -65,8 +65,8 @@ type PostResponse struct {
 	ViewCount        int         `json:"view_count"`
 	IsFeatured       bool        `json:"is_featured"`
 	PublishedAt      *time.Time  `json:"published_at,omitempty"`
-	CreatedAt        time.Time   `json:"created_at"`
-	UpdatedAt        time.Time   `json:"updated_at"`
+	CreatedAt        *time.Time   `json:"created_at"`
+	UpdatedAt        *time.Time   `json:"updated_at"`
 	Metadata         interface{} `json:"metadata,omitempty"`
 
 	Author   *User     `json:"author,omitempty"`
@@ -95,8 +95,8 @@ type Post struct {
 	ViewCount        int        `json:"view_count" gorm:"type:int;default:0"`
 	IsFeatured       bool       `json:"is_featured" gorm:"type:boolean;default:false"`
 	PublishedAt      *time.Time `json:"published_at"`
-	CreatedAt        time.Time  `json:"created_at"`
-	UpdatedAt        time.Time  `json:"updated_at"`
+	CreatedAt        *time.Time `json:"created_at"`
+	UpdatedAt        *time.Time `json:"updated_at"`
 	DeletedAt        *time.Time `json:"deleted_at,omitempty" gorm:"index"`
 	Metadata         []byte     `json:"metadata,omitempty"`
 
