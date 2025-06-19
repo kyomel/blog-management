@@ -25,7 +25,6 @@ func main() {
 		log.Fatal("Failed to migrate database:", err)
 	}
 
-	// Get SQL DB instance for raw SQL operations
 	db, err := database.GetDB().DB()
 	if err != nil {
 		log.Fatal("Failed to get database instance:", err)
@@ -35,7 +34,6 @@ func main() {
 
 	router := gin.Default()
 
-	// Health check endpoint
 	router.GET("/health", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"status":  "ok",
@@ -43,7 +41,6 @@ func main() {
 		})
 	})
 
-	// Parse JWT expiry durations
 	accessExpiry, err := time.ParseDuration(config.JWT.AccessExpiry)
 	if err != nil {
 		log.Printf("Warning: Invalid JWT access expiry format, using default 15m: %v", err)
@@ -56,12 +53,12 @@ func main() {
 		refreshExpiry = 7 * 24 * time.Hour
 	}
 
-	// Setup auth components
 	setup.SetupAuth(router, db, setup.AuthConfig{
 		AccessSecret:  config.JWT.AccessSecret,
 		RefreshSecret: config.JWT.RefreshSecret,
 		AccessExpiry:  accessExpiry,
 		RefreshExpiry: refreshExpiry,
+		Cloudinary:    config.Cloudinary,
 	})
 
 	log.Printf("Server starting on port %s", config.Server.Port)

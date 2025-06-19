@@ -11,6 +11,7 @@ func RegisterRoutes(
 	categoryHandler *CategoryHandler,
 	postHandler *PostHandler,
 	tagHandler *TagHandler,
+	uploadHandler *UploadHandler,
 	authMiddleware *middleware.AuthMiddleware,
 ) {
 	auth := router.Group("/api/auth")
@@ -48,6 +49,10 @@ func RegisterRoutes(
 	api := router.Group("/api")
 	api.Use(authMiddleware.Authenticate())
 	{
+		profile := api.Group("/profile")
+		{
+			profile.POST("/avatar", uploadHandler.UploadAvatar)
+		}
 		admin := api.Group("/admin")
 		admin.Use(authMiddleware.RequireRole("admin"))
 		{

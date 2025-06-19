@@ -10,9 +10,10 @@ import (
 )
 
 type Config struct {
-	Server   ServerConfig   `mapstructure:"server"`
-	Database DatabaseConfig `mapstructure:"database"`
-	JWT      JWTConfig      `mapstructure:"jwt"`
+	Server     ServerConfig     `mapstructure:"server"`
+	Database   DatabaseConfig   `mapstructure:"database"`
+	JWT        JWTConfig        `mapstructure:"jwt"`
+	Cloudinary CloudinaryConfig `mapstructure:"cloudinary"`
 }
 
 func LoadConfig() (*Config, error) {
@@ -65,6 +66,12 @@ func LoadConfig() (*Config, error) {
 			AccessExpiry:  viper.GetString("JWT_ACCESS_EXPIRY"),
 			RefreshExpiry: viper.GetString("JWT_REFRESH_EXPIRY"),
 		},
+		Cloudinary: CloudinaryConfig{
+			CloudName: viper.GetString("CLOUDINARY_CLOUD_NAME"),
+			APIKey:    viper.GetString("CLOUDINARY_API_KEY"),
+			APISecret: viper.GetString("CLOUDINARY_API_SECRET"),
+			Folder:    viper.GetString("CLOUDINARY_FOLDER"),
+		},
 	}
 
 	// Debug: Print configuration values (without sensitive data)
@@ -95,6 +102,10 @@ func checkRequiredConfig() error {
 		"DB_PASSWORD",
 		"DB_NAME",
 		"JWT_SECRET",
+		// Cloudinary required settings
+		"CLOUDINARY_CLOUD_NAME",
+		"CLOUDINARY_API_KEY",
+		"CLOUDINARY_API_SECRET",
 	}
 
 	for _, key := range required {
@@ -118,6 +129,8 @@ func setDefaults() {
 	viper.SetDefault("JWT_ACCESS_EXPIRY", "15m")
 	viper.SetDefault("JWT_REFRESH_EXPIRY", "7d")
 
+	viper.SetDefault("CLOUDINARY_FOLDER", "avatars")
+
 }
 
 type ServerConfig struct {
@@ -139,4 +152,11 @@ type JWTConfig struct {
 	RefreshSecret string `mapstructure:"refresh_secret"`
 	AccessExpiry  string `mapstructure:"access_expiry"`
 	RefreshExpiry string `mapstructure:"refresh_expiry"`
+}
+
+type CloudinaryConfig struct {
+	CloudName string `mapstructure:"cloud_name"`
+	APIKey    string `mapstructure:"api_key"`
+	APISecret string `mapstructure:"api_secret"`
+	Folder    string `mapstructure:"folder"`
 }

@@ -23,6 +23,7 @@ type UserRepository interface {
 	FindByUsername(ctx context.Context, username string) (*models.User, error)
 	Update(ctx context.Context, user *models.User) error
 	Delete(ctx context.Context, id uuid.UUID) error
+	UpdateAvatarURL(ctx context.Context, userID uuid.UUID, avatarURL string) error
 }
 
 type userRepository struct {
@@ -188,6 +189,30 @@ func (r *userRepository) Delete(ctx context.Context, id uuid.UUID) error {
 		WHERE id = $2 AND deleted_at IS NULL
 	`
 	result, err := r.db.ExecContext(ctx, query, time.Now(), id)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return ErrUserNotFound
+	}
+
+	return nil
+}
+
+// UpdateAvatarURL updates the avatar URL for a user
+func (r *userRepository) UpdateAvatarURL(ctx context.Context, userID uuid.UUID, avatarURL string) error {
+	query := `
+		UPDATE users
+		SET avatar_url = $1
+		WHERE id = $2 AND deleted_at IS NULL
+	`
+	result, err := r.db.ExecContext(ctx, query, avatarURL, userID)
 	if err != nil {
 		return err
 	}
